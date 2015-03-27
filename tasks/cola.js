@@ -10,20 +10,39 @@
 
 module.exports = function (grunt) {
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
+  var path = require( 'path' );
+  var compress = require( './lib/compress' );
 
   grunt.registerMultiTask('cola', 'grunt plugin for cola (colac)', function () {
 
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
-    });
+    var defineMap = {};
 
+    global.defineArray = [];
+    global.useArray = [];
+
+    function clean () {
+        defineMap = {};
+        global.defineArray = [];
+        global.useArray = [];
+    }
+
+    function clear () {
+        global.defineArray = [];
+        global.useArray = [];
+    }
+
+    require( './lib/define' ).setUp();
+
+    var options = this.options( {
+      min: false,
+      banner: ''
+    } );
+    
     // Iterate over all specified file groups.
     this.files.forEach(function (file) {
-      // Concat specified files.
+
+      clean();
+
       var src = file.src.filter(function (filepath) {
         // Warn on and remove invalid source files (if nonull was set).
         if (!grunt.file.exists(filepath)) {
@@ -32,19 +51,61 @@ module.exports = function (grunt) {
         } else {
           return true;
         }
-      }).map(function (filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
+      });
+      
+      src.forEach( function ( filepath ) {
+          clear();
+          require( path.resolve( filepath ) ); 
 
-      // Handle options.
-      src += options.punctuation;
+          defineMap[filepath] = {
+              defineArray: global.defineArray,
+              useArray: global.useArray
+          }
+      } );
 
-      // Write the destination file.
-      grunt.file.write(file.dest, src);
+      var defineArr = [];
+      var useArr = [];
+      var content;
 
-      // Print a success message.
-      grunt.log.writeln('File "' + file.dest + '" created.');
+      if ( file.dest ) { // 合并文件
+        for ( var p in defineMap ) {
+          defineArr = defineArr.concat( defineMap[p].defineArray );
+          useArr = useArr.concat( defineMap[p].useArray );
+        }
+
+        content = defineArr.join( '\n' ) + useArr.join( '\n' );
+
+        if ( options.min ) { //压缩
+          content = compress( content );
+        }
+
+        content = options.banner + content;
+
+        grunt.file.write( file.dest, content );
+        grunt.log.writeln('File "' + file.dest + '" created.');
+
+      }
+      
+      if ( file.dist ) {
+
+        for ( var p in defineMap ) {
+
+          content = defineMap[p].defineArray.join( '\n' ) + defineMap[p].useArray.join( '\n' );
+
+          if ( options.m ) {
+            content = compress( content );
+          }
+
+          content = options.banner + content;
+
+          var distFilepath = path.join( file.dist, p );
+
+          grunt.file.write( distFilepath, content );
+
+          grunt.log.writeln('File "' + distFilepath + '" created.');
+        }
+      }
+
     });
   });
 

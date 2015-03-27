@@ -9,11 +9,15 @@
 'use strict';
 
 module.exports = function (grunt) {
+
+  require('time-grunt')(grunt);
+
   // load all npm grunt tasks
   require('load-grunt-tasks')(grunt);
 
   // Project configuration.
   grunt.initConfig({
+    pkg: grunt.file.readJSON( 'package.json' ),
     jshint: {
       all: [
         'Gruntfile.js',
@@ -33,21 +37,32 @@ module.exports = function (grunt) {
 
     // Configuration to be run (and then tested).
     cola: {
-      default_options: {
+      //default_options: {
+      //  options: {
+      //  },
+      //  files: {
+      //    'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123'],
+      //    'tmp/default_options2': ['test/fixtures/testing', 'test/fixtures/123']
+      //  }
+      //},
+      //custom_options: {
+      //  options: {
+      //    separator: ': ',
+      //    punctuation: ' !!!'
+      //  },
+      //  files: {
+      //    'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
+      //  }
+      //},
+      video: {
         options: {
+          min: true,
+          //banner: '/* creep <=% grunt.template.today( "yyyy-mm-dd h:MM:ss" ) %> */\n'
+          banner: '/* creep <%= pkg.name %> <%= grunt.template.today( "yyyy-mm-dd HH:MM:ss" ) %> */\n'
         },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
-        }
-      },
-      custom_options: {
-        options: {
-          separator: ': ',
-          punctuation: ' !!!'
-        },
-        files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
-        }
+        files: [
+          { src: 'testlib/**/*.js', dest: 'dist/all.js', dist: 'dist/build' }
+        ]
       }
     },
 

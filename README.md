@@ -57,10 +57,30 @@ In this example, the default options are used to do something with whatever. So 
 ```js
 grunt.initConfig({
   cola: {
-    options: {},
+    options: {
+      min: true, // minify js file using uglify, default false;
+      banner: '/* <%= pkg.name %> <%= grunt.template.today( "yyyy-mm-dd HH:MM:ss" ) %> */\n'
+    },
     files: {
       'dest/default_options': ['src/testing', 'src/123'],
     },
+  },
+})
+```
+```js
+grunt.initConfig({
+  cola: {
+    options: {
+      min: true, // minify js file using uglify, default false;
+      banner: '/* <%= pkg.name %> <%= grunt.template.today( "yyyy-mm-dd HH:MM:ss" ) %> */\n'
+    },
+    video: {
+      options: {},
+      files: [
+        //dist: don't concat js, just put file into dist dir
+        { src: 'testlib/**/*.js', dest: 'dist/all.js', dist: 'dist/build' }
+      ]
+    }
   },
 })
 ```
