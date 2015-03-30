@@ -37,7 +37,7 @@ module.exports = function (grunt) {
       min: false,
       banner: ''
     } );
-    
+
     // Iterate over all specified file groups.
     this.files.forEach(function (file) {
 
@@ -52,10 +52,10 @@ module.exports = function (grunt) {
           return true;
         }
       });
-      
+
       src.forEach( function ( filepath ) {
           clear();
-          require( path.resolve( filepath ) ); 
+          require( path.resolve( filepath ) );
 
           defineMap[filepath] = {
               defineArray: global.defineArray,
@@ -73,7 +73,8 @@ module.exports = function (grunt) {
           useArr = useArr.concat( defineMap[p].useArray );
         }
 
-        content = defineArr.join( '\n' ) + useArr.join( '\n' );
+        //content = defineArr.join( '\n' ) + useArr.join( '\n' );
+        content = defineArr.concat( useArr ).join( '\n' );
 
         if ( options.min ) { //压缩
           content = compress( content );
@@ -85,7 +86,7 @@ module.exports = function (grunt) {
         grunt.log.writeln('File "' + file.dest + '" created.');
 
       }
-      
+
       if ( file.dist ) {
 
         for ( var p in defineMap ) {
