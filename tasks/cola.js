@@ -19,16 +19,19 @@ module.exports = function (grunt) {
 
     global.defineArray = [];
     global.useArray = [];
+    global.currentFilepath = '';
 
     function clean () {
         defineMap = {};
         global.defineArray = [];
         global.useArray = [];
+        global.currentFilepath = '';
     }
 
     function clear () {
         global.defineArray = [];
         global.useArray = [];
+        global.currentFilepath = '';
     }
 
     require( './lib/define' ).setUp();
@@ -55,6 +58,9 @@ module.exports = function (grunt) {
 
       src.forEach( function ( filepath ) {
           clear();
+          //global.currentFilepath = filepath.replace( /^js\//, '' );
+          global.currentFilepath = filepath;
+
           require( path.resolve( filepath ) );
 
           defineMap[filepath] = {

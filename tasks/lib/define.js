@@ -1,3 +1,5 @@
+var path = require( 'path' );
+
 var isType = function ( type ) {
     return function ( obj ) {
         return {}.toString.call( obj ) == '[object ' + type + ']';
@@ -73,6 +75,11 @@ var define = function () {
     }
 
     var content = '';
+
+    if ( !id && global.currentFilepath ) {
+      id = global.currentFilepath.replace( /^js\//, '' );
+      id = path.join( path.dirname( id ), path.basename( id, '.js' ) );
+    }
 
     if ( id ) {
         content = 'cola.define("' + id + '", ' + JSON.stringify( deps ) + ', ' + factory.toString() + ');';
